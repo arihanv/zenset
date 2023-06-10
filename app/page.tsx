@@ -1,14 +1,12 @@
 "use client"
-
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
-
 import { siteConfig } from "@/config/site"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export default function IndexPage() {
-  const [sentences, setSentences] = useState([])
+  const [sentences, setSentences] = useState<any>([])
   const [input, setInput] = useState("")
   const [currentTime, setCurrentTime] = useState(new Date())
   const [hoveredIndex, setHoveredIndex] = useState(-1)
@@ -21,9 +19,9 @@ export default function IndexPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const getTimeElapsed = (timestamp) => {
-    const elapsed = Math.floor((currentTime - timestamp) / 1000)
-    if(elapsed < 0) return '0s ago'
+  const getTimeElapsed = (timestamp: any) => {
+    const elapsed = Math.floor(((currentTime as any) - timestamp) / 1000)
+    if (elapsed < 0) return "0s ago"
 
     if (elapsed < 60) {
       return `${elapsed}s ago`
@@ -36,14 +34,14 @@ export default function IndexPage() {
     }
   }
 
-  const handleMouseEnter = (index) => {
+  const handleMouseEnter = (index: number) => {
     setHoveredIndex(index)
   }
 
-  const handleMouseLeave = (index) => {
+  const handleMouseLeave = (index: number) => {
     setHoveredIndex(-1)
   }
-  
+
   return (
     <section className="grid items-center gap-6 pb-8 pt-6 md:py-10">
       <div className="mx-auto px-3 w-full flex max-w-[980px] flex-col gap-3">
@@ -56,7 +54,7 @@ export default function IndexPage() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                setSentences((prev) => [
+                setSentences((prev: any) => [
                   { text: input, timestamp: new Date() },
                   ...prev,
                 ])
@@ -67,17 +65,18 @@ export default function IndexPage() {
           />
         </div>
         <div className="flex flex-col gap-2">
-          {sentences.map((s, i) => (
+          {sentences.map((s: any, i: number) => (
             <div
               className="flex gap-2"
               key={i}
               onMouseEnter={() => handleMouseEnter(i)}
-              onMouseLeave={handleMouseLeave}
+              onMouseLeave={() => handleMouseLeave(i)}
             >
               <div
                 className={`hover:dark:bg-gray-900 hover:bg-gray-100  h-10 rounded-md px-3 w-full py-2  ${
-                  
-                  Math.floor((currentTime - s.timestamp) / 1000) < 0.25 ? '' : 'blur-[2px] fade-in' 
+                  Math.floor(((currentTime as any) - s.timestamp) / 1000) < 0.25
+                    ? ""
+                    : "blur-[2px] fade-in"
                 }`}
               >
                 {s.text}
