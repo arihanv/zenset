@@ -1,38 +1,96 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
 
 import { siteConfig } from "@/config/site"
 import { buttonVariants } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export default function IndexPage() {
+  const [sentences, setSentences] = useState([])
+  const [input, setInput] = useState("")
+  const [currentTime, setCurrentTime] = useState(new Date())
+  const [hoveredIndex, setHoveredIndex] = useState(-1)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const getTimeElapsed = (timestamp) => {
+    const elapsed = Math.floor((currentTime - timestamp) / 1000)
+    if(elapsed < 0) return '0s ago'
+
+    if (elapsed < 60) {
+      return `${elapsed}s ago`
+    } else if (elapsed < 3600) {
+      const minutes = Math.floor(elapsed / 60)
+      return `${minutes}m ago`
+    } else {
+      const hours = Math.floor(elapsed / 3600)
+      return `${hours}hr ago`
+    }
+  }
+
+  const handleMouseEnter = (index) => {
+    setHoveredIndex(index)
+  }
+
+  const handleMouseLeave = (index) => {
+    setHoveredIndex(-1)
+  }
+  
   return (
-    <section className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
-      <div className="flex max-w-[980px] flex-col items-start gap-2">
-        <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-4xl">
-          Beautifully designed components <br className="hidden sm:inline" />
-          built with Radix UI and Tailwind CSS.
-        </h1>
-        <p className="max-w-[700px] text-lg text-muted-foreground">
-          Accessible and customizable components that you can copy and paste
-          into your apps. Free. Open Source. And Next.js 13 Ready.
-        </p>
-      </div>
-      <div className="flex gap-4">
-        <Link
-          href={siteConfig.links.docs}
-          target="_blank"
-          rel="noreferrer"
-          className={buttonVariants()}
-        >
-          Documentation
-        </Link>
-        <Link
-          target="_blank"
-          rel="noreferrer"
-          href={siteConfig.links.github}
-          className={buttonVariants({ variant: "outline" })}
-        >
-          GitHub
-        </Link>
+    <section className="grid items-center gap-6 pb-8 pt-6 md:py-10">
+      <div className="mx-auto px-3 w-full flex max-w-[980px] flex-col gap-3">
+        <div className="flex flex-col gap-1 border-b dark:border-gray-800 border-gray-200 py-1">
+          <div className="tracking-tight font-bold text-xl">Prompt</div>
+          <Input
+            type="email"
+            placeholder="Email"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setSentences((prev) => [
+                  { text: input, timestamp: new Date() },
+                  ...prev,
+                ])
+                setInput("")
+              }
+            }}
+            className="border-0 focus-visible:ring-0 hover:dark:bg-gray-900 hover:bg-gray-100 transition ease-in-out delay-100"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          {sentences.map((s, i) => (
+            <div
+              className="flex gap-2"
+              key={i}
+              onMouseEnter={() => handleMouseEnter(i)}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div
+                className={`hover:dark:bg-gray-900 hover:bg-gray-100  h-10 rounded-md px-3 w-full py-2  ${
+                  
+                  Math.floor((currentTime - s.timestamp) / 1000) < 0.25 ? '' : 'blur-[2px] fade-in' 
+                }`}
+              >
+                {s.text}
+              </div>
+              {hoveredIndex === i && (
+                <span className="text-xs text-gray-400 ml-2 flex flex-col items-center justify-center whitespace-pre">
+                  {getTimeElapsed(s.timestamp)}
+                  {/* {s.timestamp.toLocaleTimeString()} */}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )
