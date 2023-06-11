@@ -33,7 +33,10 @@ export default function IndexPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [hoveredIndex, setHoveredIndex] = useState(-1)
   const [promptIndex, setPromptIndex] = useState(0)
-  const [fullData, setFullData] = useState<FullDataState>({})
+  const [fullData, setFullData] = useState(() => {
+    const savedData = localStorage.getItem("fullData")
+    return savedData ? JSON.parse(savedData) : {}
+  })
   const [prompts, setPrompts] = useState([
     "What is one small thing that brought you joy or gratitude today?",
     "How did you practice self-care or self-compassion today?",
@@ -48,6 +51,15 @@ export default function IndexPage() {
     }, 1000)
 
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const savedData = localStorage.getItem("fullData")
+    console.log(savedData)
+    if (savedData) {
+      console.log(JSON.parse(savedData))
+      setFullData(JSON.parse(savedData))
+    }
   }, [])
 
   useEffect(() => {
@@ -88,6 +100,7 @@ export default function IndexPage() {
       [prompts[promptIndex]]: sentences,
     }
     setFullData(updatedFullData)
+    localStorage.setItem("fullData", JSON.stringify(updatedFullData))
   }, [sentences])
 
   useEffect(() => {
@@ -223,8 +236,10 @@ export default function IndexPage() {
                     onMouseEnter={() => handleMouseEnter(i)}
                     onMouseLeave={() => handleMouseLeave()}
                     className={`hover:dark:bg-gray-900 hover:bg-gray-100 rounded-md px-3 w-full py-2 gap-1 flex flex-wrap-reverse justify-between ${
-                      Math.floor(((currentTime as any) - s.timestamp) / 1000) <
-                      0.25
+                      Math.floor(
+                        ((currentTime as any) - Number(new Date(s.timestamp))) /
+                          1000
+                      ) < 0.25
                         ? ""
                         : "blur-[2px] fade-in"
                     }`}
@@ -234,7 +249,7 @@ export default function IndexPage() {
                     </span>
                     {hoveredIndex === i && (
                       <span className="text-xs text-gray-400 flex items-center gap-2 justify-center whitespace-pre">
-                        {getTimeElapsed(s.timestamp)}
+                        {getTimeElapsed(new Date(s.timestamp))}
                         <button
                           className="text-gray-400"
                           onClick={() => handleDelete(i)}
