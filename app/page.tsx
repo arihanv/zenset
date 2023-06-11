@@ -34,8 +34,10 @@ export default function IndexPage() {
   const [hoveredIndex, setHoveredIndex] = useState(-1)
   const [promptIndex, setPromptIndex] = useState(0)
   const [fullData, setFullData] = useState(() => {
+    if (typeof window !== 'undefined') {
     const savedData = localStorage.getItem("fullData")
     return savedData ? JSON.parse(savedData) : {}
+    }
   })
   const [prompts, setPrompts] = useState([
     "What is one small thing that brought you joy or gratitude today?",
