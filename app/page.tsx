@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Trash, Trash2 } from "lucide-react"
+import { ArrowLeft, ArrowRight, Trash, Trash2 } from "lucide-react"
 
 import { siteConfig } from "@/config/site"
 import { buttonVariants } from "@/components/ui/button"
@@ -13,6 +13,15 @@ export default function IndexPage() {
   const [input, setInput] = useState("")
   const [currentTime, setCurrentTime] = useState(new Date())
   const [hoveredIndex, setHoveredIndex] = useState(-1)
+  const [promptIndex, setPromptIndex] = useState(0)
+  
+  const prompt = [
+    "What is one small thing that brought you joy or gratitude today?",
+    "How did you practice self-care or self-compassion today?",
+    "What is something you learned about yourself today?",
+    "Describe a challenging situation you encountered today and how you responded mindfully.",
+    "What is something you learned about someone else today?",
+  ]
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,9 +63,17 @@ export default function IndexPage() {
     <section className="grid items-center gap-6 pb-8 pt-6 md:py-10">
       <div className="mx-auto px-3 w-full flex max-w-[980px] flex-col gap-3 overflow-hidden">
         <div className="flex flex-col gap-1 border-b dark:border-gray-800 border-gray-200 py-1">
-          <div className="tracking-tight font-bold text-xl">Prompt</div>
+          <div className="flex gap-1">
+            <button  disabled={promptIndex === 0} className={`${promptIndex === 0 ? 'text-gray-400 opacity-50' : ''}`} onClick={() => setPromptIndex(promptIndex - 1)}>
+              <ArrowLeft size={17} />
+            </button>
+            <div className="tracking-tight font-bold text-xl">{prompt[promptIndex]}</div>
+            <button className="" onClick={() => setPromptIndex(promptIndex + 1)}>
+              <ArrowRight size={17} />
+            </button>
+          </div>
           <Input
-            type="email"
+            type="text"
             placeholder="Write your heart out..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
