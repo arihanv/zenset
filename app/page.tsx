@@ -2,11 +2,27 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, ArrowRight, Trash, Trash2 } from "lucide-react"
+import {
+  ArrowLeft,
+  ArrowRight,
+  Edit3,
+  PlusCircle,
+  Trash,
+  Trash2,
+} from "lucide-react"
 
 import { siteConfig } from "@/config/site"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+
+var Sentiment = require("sentiment")
+var sentiment = new Sentiment()
 
 export default function IndexPage() {
   const [sentences, setSentences] = useState<any>([])
@@ -14,14 +30,13 @@ export default function IndexPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [hoveredIndex, setHoveredIndex] = useState(-1)
   const [promptIndex, setPromptIndex] = useState(0)
-  
-  const prompt = [
+  const [prompts, setPrompts] = useState([
     "What is one small thing that brought you joy or gratitude today?",
     "How did you practice self-care or self-compassion today?",
     "What is something you learned about yourself today?",
     "Describe a challenging situation you encountered today and how you responded mindfully.",
     "What is something you learned about someone else today?",
-  ]
+  ])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -64,13 +79,87 @@ export default function IndexPage() {
       <div className="mx-auto px-3 w-full flex max-w-[980px] flex-col gap-3 overflow-hidden">
         <div className="flex flex-col gap-1 border-b dark:border-gray-800 border-gray-200 py-1">
           <div className="flex gap-1">
-            <button  disabled={promptIndex === 0} className={`${promptIndex === 0 ? 'text-gray-400 opacity-50' : ''}`} onClick={() => setPromptIndex(promptIndex - 1)}>
+            <button
+              disabled={promptIndex === 0}
+              className={`${
+                promptIndex === 0 ? "text-gray-400 opacity-50" : ""
+              }`}
+              onClick={() => setPromptIndex(promptIndex - 1)}
+            >
               <ArrowLeft size={17} />
             </button>
-            <div className="tracking-tight font-bold text-xl">{prompt[promptIndex]}</div>
-            <button className="" onClick={() => setPromptIndex(promptIndex + 1)}>
+            <button
+              disabled={promptIndex === prompts.length - 1}
+              className={`${
+                promptIndex === prompts.length - 1
+                  ? "text-gray-400 opacity-50"
+                  : ""
+              }`}
+              onClick={() => setPromptIndex(promptIndex + 1)}
+            >
               <ArrowRight size={17} />
             </button>
+            <div className="mx-2 flex gap-1">
+              <div className="tracking-tight font-bold text-xl">
+                {prompts[promptIndex]}
+              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button>
+                    <Edit3 size={17} />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-90">
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <h4 className="font-medium leading-none">Prompts</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Set the guided prompts that you want to see.
+                      </p>
+                    </div>
+                    <div className="grid gap-2">
+                      {prompts.map((p, i) => (
+                        <div className="flex items-center gap-4">
+                          <Input
+                            type="text"
+                            value={p}
+                            onChange={(e) => {
+                              const newPrompts = [...prompts]
+                              newPrompts[i] = e.target.value
+                              setPrompts(newPrompts)
+                            }}
+                            id="width"
+                            className="col-span-2 h-8"
+                          />
+                          <button
+                            disabled={prompts.length === 1}
+                              className={`${
+                                prompts.length === 1 ? "text-gray-400 opacity-50" : ""
+                              }`}
+                            onClick={() =>
+                              setPrompts(
+                                prompts.filter(
+                                  (_: any, index: number) => index !== i
+                                )
+                              )
+                            }
+                          >
+                            <Trash size={20} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    {prompts[prompts.length - 1] !== "" && (
+                      <button onClick={() => setPrompts([...prompts, ""])}>
+                        <div className="w-full dark:bg-gray-900 bg-gray-100 rounded-lg flex items-center justify-center py-1.5">
+                          <PlusCircle size={20} />
+                        </div>
+                      </button>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
           <Input
             type="text"
@@ -93,32 +182,40 @@ export default function IndexPage() {
           {sentences.length !== 0 && (
             <>
               {sentences.map((s: any, i: number) => (
-                <div
-                  key={i}
-                  onMouseEnter={() => handleMouseEnter(i)}
-                  onMouseLeave={() => handleMouseLeave()}
-                  className={`hover:dark:bg-gray-900 hover:bg-gray-100 rounded-md px-3 w-full py-2 gap-1 flex flex-wrap-reverse justify-between ${
-                    Math.floor(((currentTime as any) - s.timestamp) / 1000) <
-                    0.25
-                      ? ""
-                      : "blur-[2px] fade-in"
-                  }`}
-                >
-                  <span className="whitespace-normal break-words overflow-hidden">
-                    {s.text}
-                  </span>
-                  {hoveredIndex === i && (
-                    <span className="text-xs text-gray-400 flex items-center gap-2 justify-center whitespace-pre">
-                      {getTimeElapsed(s.timestamp)}
-                      <button
-                        className="text-gray-400"
-                        onClick={() => handleDelete(i)}
-                      >
-                        <Trash size={17} />
-                      </button>
-                      {/* {s.timestamp.toLocaleTimeString()} */}
+                <div className="flex items-center gap-2">
+                  <div className="text-sm">
+                    {/* {sentiment.analyze(s.text).score} */}
+                    {/* <div className={`h-2 w-2 aspect-square opacity-70 rounded-full ${sentiment.analyze(s.text).score > 0 ? 'bg-green-500' : sentiment.analyze(s.text).score < 0 ? 'bg-red-500' : 'bg-gray-300'}`}>
+                    
+                  </div> */}
+                  </div>
+                  <div
+                    key={i}
+                    onMouseEnter={() => handleMouseEnter(i)}
+                    onMouseLeave={() => handleMouseLeave()}
+                    className={`hover:dark:bg-gray-900 hover:bg-gray-100 rounded-md px-3 w-full py-2 gap-1 flex flex-wrap-reverse justify-between ${
+                      Math.floor(((currentTime as any) - s.timestamp) / 1000) <
+                      0.25
+                        ? ""
+                        : "blur-[2px] fade-in"
+                    }`}
+                  >
+                    <span className="whitespace-normal break-words overflow-hidden">
+                      {s.text}
                     </span>
-                  )}
+                    {hoveredIndex === i && (
+                      <span className="text-xs text-gray-400 flex items-center gap-2 justify-center whitespace-pre">
+                        {getTimeElapsed(s.timestamp)}
+                        <button
+                          className="text-gray-400"
+                          onClick={() => handleDelete(i)}
+                        >
+                          <Trash size={17} />
+                        </button>
+                        {/* {s.timestamp.toLocaleTimeString()} */}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </>
