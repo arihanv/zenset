@@ -23,6 +23,9 @@ import {
 
 var Sentiment = require("sentiment")
 var sentiment = new Sentiment()
+interface FullDataState {
+  [key: string]: any[]
+}
 
 export default function IndexPage() {
   const [sentences, setSentences] = useState<any>([])
@@ -30,6 +33,7 @@ export default function IndexPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [hoveredIndex, setHoveredIndex] = useState(-1)
   const [promptIndex, setPromptIndex] = useState(0)
+  const [fullData, setFullData] = useState<FullDataState>({})
   const [prompts, setPrompts] = useState([
     "What is one small thing that brought you joy or gratitude today?",
     "How did you practice self-care or self-compassion today?",
@@ -45,6 +49,10 @@ export default function IndexPage() {
 
     return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    console.log(fullData)
+  }, [fullData])
 
   const getTimeElapsed = (timestamp: any) => {
     const elapsed = Math.floor(((currentTime as any) - timestamp) / 1000)
@@ -73,6 +81,22 @@ export default function IndexPage() {
     setSentences((prev: any) => prev.filter((_: any, i: number) => i !== index))
     setHoveredIndex(-1)
   }
+
+  useEffect(() => {
+    const updatedFullData = {
+      ...fullData,
+      [prompts[promptIndex]]: sentences,
+    }
+    setFullData(updatedFullData)
+  }, [sentences])
+
+  useEffect(() => {
+    if (!fullData[prompts[promptIndex]]) {
+      setSentences([])
+    } else {
+      setSentences(fullData[prompts[promptIndex]])
+    }
+  }, [promptIndex])
 
   return (
     <section className="grid items-center gap-6 pb-8 pt-6 md:py-10">
@@ -119,7 +143,7 @@ export default function IndexPage() {
                     </div>
                     <div className="grid gap-2">
                       {prompts.map((p, i) => (
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4" key={i}>
                           <Input
                             type="text"
                             value={p}
@@ -187,7 +211,7 @@ export default function IndexPage() {
           {sentences.length !== 0 && (
             <>
               {sentences.map((s: any, i: number) => (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" key={i}>
                   <div className="text-sm">
                     {/* {sentiment.analyze(s.text).score} */}
                     {/* <div className={`h-2 w-2 aspect-square opacity-70 rounded-full ${sentiment.analyze(s.text).score > 0 ? 'bg-green-500' : sentiment.analyze(s.text).score < 0 ? 'bg-red-500' : 'bg-gray-300'}`}>
