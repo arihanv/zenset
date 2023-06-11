@@ -23,9 +23,6 @@ import {
 
 var Sentiment = require("sentiment")
 var sentiment = new Sentiment()
-interface FullDataState {
-  [key: string]: any[]
-}
 
 export default function IndexPage() {
   const [sentences, setSentences] = useState<any>([])
@@ -34,9 +31,9 @@ export default function IndexPage() {
   const [hoveredIndex, setHoveredIndex] = useState(-1)
   const [promptIndex, setPromptIndex] = useState(0)
   const [fullData, setFullData] = useState(() => {
-    if (typeof window !== 'undefined') {
-    const savedData = localStorage.getItem("fullData")
-    return savedData ? JSON.parse(savedData) : {}
+    if (typeof window !== "undefined") {
+      const savedData = localStorage.getItem("fullData")
+      return savedData ? JSON.parse(savedData) : {}
     }
   })
   const [prompts, setPrompts] = useState([
@@ -57,16 +54,10 @@ export default function IndexPage() {
 
   useEffect(() => {
     const savedData = localStorage.getItem("fullData")
-    console.log(savedData)
     if (savedData) {
-      console.log(JSON.parse(savedData))
       setFullData(JSON.parse(savedData))
     }
   }, [])
-
-  useEffect(() => {
-    console.log(fullData)
-  }, [fullData])
 
   const getTimeElapsed = (timestamp: any) => {
     const elapsed = Math.floor(((currentTime as any) - timestamp) / 1000)
@@ -139,7 +130,7 @@ export default function IndexPage() {
               <ArrowRight size={17} />
             </button>
             <div className="mx-2 flex gap-1">
-              <div className="tracking-tight font-bold text-xl">
+              <div className="tracking-tight font-bold text-base md:text-xl">
                 {prompts[promptIndex]}
               </div>
               <Popover>
@@ -258,7 +249,7 @@ export default function IndexPage() {
                         >
                           <Trash size={17} />
                         </button>
-                        {/* {s.timestamp.toLocaleTimeString()} */}
+                        {/* {(new Date(s.timestamp)).toLocaleTimeString()} */}
                       </span>
                     )}
                   </div>
