@@ -1,12 +1,12 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: "Next.js",
+  name: "Zenset",
   description:
-    "Beautifully designed components built with Radix UI and Tailwind CSS.",
+    "A mental health platform that allows you to write your thoughts and feelings in a safe and secure environment.",
   mainNav: [
     {
-      title: "Home",
+      title: "Write",
       href: "/",
     },
   ],
