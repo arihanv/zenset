@@ -77,7 +77,7 @@ export default function IndexPage() {
   return (
     <section className="grid items-center gap-6 pb-8 pt-6 md:py-10">
       <div className="mx-auto px-3 w-full flex max-w-[980px] flex-col gap-3 overflow-hidden">
-        <div className="flex flex-col gap-1 border-b dark:border-gray-800 border-gray-200 py-1">
+        <div className="flex flex-col gap-1.5 border-b dark:border-gray-800 border-gray-200 py-1">
           <div className="flex gap-1">
             <button
               disabled={promptIndex === 0}
@@ -133,16 +133,21 @@ export default function IndexPage() {
                           />
                           <button
                             disabled={prompts.length === 1}
-                              className={`${
-                                prompts.length === 1 ? "text-gray-400 opacity-50" : ""
-                              }`}
-                            onClick={() =>
+                            className={`${
+                              prompts.length === 1
+                                ? "text-gray-400 opacity-50"
+                                : ""
+                            }`}
+                            onClick={() => {
+                              setPromptIndex((prevIndex) =>
+                                prevIndex === 0 ? 0 : prevIndex - 1
+                              )
                               setPrompts(
                                 prompts.filter(
                                   (_: any, index: number) => index !== i
                                 )
                               )
-                            }
+                            }}
                           >
                             <Trash size={20} />
                           </button>
