@@ -2,11 +2,15 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import axios from "axios"
 import {
   ArrowLeft,
   ArrowRight,
   Edit3,
+  Frown,
+  Meh,
   PlusCircle,
+  Smile,
   Trash,
   Trash2,
 } from "lucide-react"
@@ -30,11 +34,10 @@ export default function IndexPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [hoveredIndex, setHoveredIndex] = useState(-1)
   const [promptIndex, setPromptIndex] = useState(0)
-  const [words, setWords] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("wordCount")
-    }
-  })
+  const [words, setWords] = useState(0)
+  const [mood, setMood] = useState<number | null>(null);
+  useEffect(() => setWords(Number(localStorage.getItem("wordCount")) ?? "null"))
+
   const [fullData, setFullData] = useState(() => {
     if (typeof window !== "undefined") {
       const savedData = localStorage.getItem(`${getDateEpoch()}`)
@@ -59,13 +62,28 @@ export default function IndexPage() {
       return savedData ? JSON.parse(savedData) : {}
     }
   })
-  const [prompts, setPrompts] = useState([
-    "What is one small thing that brought you joy or gratitude today?",
-    "How did you practice self-care or self-compassion today?",
-    "What is something you learned about yourself today?",
-    "Describe a challenging situation you encountered today and how you responded mindfully.",
-    "What is something you learned about someone else today?",
-  ])
+  const [prompts, setPrompts] = useState<string[]>([])
+  useEffect(() => {
+    if (mood === 0) {
+      setPrompts([
+        "What is one small thing that provided you comfort or solace today, even in the midst of sadness?",
+        "Describe an act of kindness or support that someone showed you during a difficult time.",
+        "What is one positive thought or affirmation that helps you stay hopeful despite feeling sad?",
+      ])
+    } else if (mood === 1) {
+      setPrompts([
+        "What is one thing that brought a subtle sense of contentment or satisfaction to your day today?",
+        "Describe a moment of peace or calmness that you experienced recently, even if everything else seemed average.",
+        "What is one small accomplishment or task you completed today that made you feel a sense of accomplishment, however minor?",
+      ])
+    } else {
+      setPrompts([
+        "What is one amazing thing that made you smile or filled you with joy today?",
+        "Describe a moment of pure happiness or excitement that you experienced recently.",
+        "What are three things you feel grateful for in your life right now?",
+      ])
+    }
+  }, [mood])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -130,6 +148,26 @@ export default function IndexPage() {
   }
 
   useEffect(() => {
+    if (words === undefined || words == null) {
+      return
+    }
+    if (Number(words) === 10) {
+      // alert("You've written 500 words today! That's amazing!")
+      axios
+        .get("/api/redeem")
+        .then((response) => {
+          // Handle the data received from the API
+          console.log(response.data.message)
+          alert(response.data.message)
+        })
+        .catch((error) => {
+          // Handle any errors that occurred during the request
+          console.error(error)
+        })
+    }
+  }, [words])
+
+  useEffect(() => {
     const updatedFullData = {
       ...fullData,
       [prompts[promptIndex]]: sentences,
@@ -146,11 +184,43 @@ export default function IndexPage() {
     }
   }, [promptIndex])
 
+  if (mood === null) {
+    return (
+      <section className="grid items-center gap-6 pb-8 pt-6 md:py-10 h-full min-h-[85vh]">
+        <div className="mx-auto px-3 w-full flex max-w-[980px] flex-col gap-3 overflow-hidden justify-center items-center h-full">
+          <div className="text-xl md:text-3xl tracking-tight font-medium">
+            How are you feeling?
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setMood(0)}
+              className="text-red-600 hover:ring-4 hover:ring-red-400 rounded-full p-2"
+            >
+              <Frown size={100} />
+            </button>
+            <button
+              onClick={() => setMood(1)}
+              className="text-yellow-600 hover:ring-4 hover:ring-yellow-400 rounded-full p-2"
+            >
+              <Meh size={100} />
+            </button>
+            <button
+              onClick={() => setMood(2)}
+              className="text-green-600 hover:ring-4 hover:ring-green-400 rounded-full p-2"
+            >
+              <Smile size={100} />
+            </button>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="grid items-center gap-6 pb-8 pt-6 md:py-10">
       <div className="mx-auto px-3 w-full flex max-w-[980px] flex-col gap-3 overflow-hidden">
         <div className="flex flex-col gap-1.5 border-b dark:border-gray-800 border-gray-200 py-1">
-          <div className="bg-gray-900 bg-opacity-80 rounded-xl w-fit px-2.5 py-1.5 flex gap-1 items-end mb-2">
+          <div className="dark:bg-gray-900 bg-gray-100 bg-opacity-80 rounded-xl w-fit px-2.5 py-1.5 flex gap-1 items-end mb-2">
             <div className="text-3xl font-medium">{words ?? 0}</div>
             <div className="">Words</div>
           </div>
@@ -249,6 +319,7 @@ export default function IndexPage() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
+                if (input === "") return
                 setSentences((prev: any) => [
                   { text: input, timestamp: new Date() },
                   ...prev,

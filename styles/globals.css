@@ -116,7 +116,7 @@
   }
 
   .tree-container {
-    @apply bg-gray-800 text-white border-r border-y border-gray-700 rounded-r p-3.5 h-full fixed md:static md:block;
+    @apply dark:bg-gray-900 bg-gray-700 text-white border-r border-y dark:border-gray-800 border-gray-500 rounded-r p-3.5 h-full fixed md:static md:block;
     @apply transition-transform duration-500 ease-in-out;
     transform: translateX(-100%);
     opacity: 0;

@@ -34,7 +34,7 @@ export default function IndexPage({
   return (
     <section className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
       <div className="flex max-w-[980px] flex-col items-start gap-2">
-        <h1 className="text-2xl font-semibold border-b-2 w-full pb-2">
+        <h1 className="text-3xl font-bold border-b-2 w-full pb-2">
           {params.id.toString() === "today" ||
           params.id.toString() === getDateEpoch().toString()
             ? "Today's Journal"
@@ -50,12 +50,16 @@ export default function IndexPage({
               <>
                 {/* @ts-ignore */}
                 {texts.length !== 0 && (
-                  <div key={question} className="mb-7">
-                    <h3 className="font-bold tracking-tight text-2xl mb-1">
-                      {question}
-                    </h3>
-                    {/* @ts-ignore */}
-                    <ul>{texts.map((text, index) => text.text).join(". ")}</ul>
+                  <div className="hover:bg-gray-200 p-2.5 hover:rounded-xl w-full border-b">
+                    <div key={question} className="mb-7">
+                      <h3 className="font-semibold tracking-tight text-2xl mb-1">
+                        {question}
+                      </h3>
+                      <ul>
+                        {/* @ts-ignore */}
+                        {texts.map((text, index) => text.text).join(". ")}
+                      </ul>
+                    </div>
                   </div>
                 )}
               </>

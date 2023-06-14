@@ -4,7 +4,6 @@ import React from "react"
 import { useRouter } from "next/navigation"
 import { GeistProvider, Tree } from "@geist-ui/core"
 import { Menu, XCircle } from "lucide-react"
-import Link from "next/link"
 
 interface LayoutProps {
   children: React.ReactNode
@@ -19,22 +18,6 @@ export default function Layout({ children }: LayoutProps) {
     }
   })
 
-  // React.useEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     setDates(JSON.parse(localStorage.getItem("dates") ?? "null"))
-  //   }
-  // }, [])
-
-  // if(JSON.parse(localStorage.getItem("dates") ?? "null") === null) {
-  //   return (
-  //     <div className="flex min-h-[100vh] items-center justify-center text-3xl">
-  //       You Need to Write Something First
-  //         <Link href="/">
-  //           hello
-  //         </Link>
-  //     </div>
-  //   )
-  // }
   {/* @ts-ignore */}
   const files = dates.map((name) => {
     const currentDate = new Date(name * 1000)
@@ -56,15 +39,6 @@ export default function Layout({ children }: LayoutProps) {
     // console.log(epochSeconds)
     router.push(`/journal/${epochSeconds}`)
   }
-
-  // React.useEffect(() => {
-  //   {/* @ts-ignore */}
-  //   setDates(JSON.parse(localStorage.getItem("dates")));
-  // }, [])
-
-  // React.useEffect(() => {
-  //   console.log(dates)
-  // }, [dates])
 
   return (
     <div className="flex min-h-[100vh]">
@@ -105,7 +79,7 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </GeistProvider>
-      <main className="dark:bg-gray-900 bg-gray-100 w-full">{children}</main>
+      <main className="dark:bg-black bg-gray-100 w-full">{children}</main>
     </div>
   )
 }
