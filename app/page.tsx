@@ -32,7 +32,25 @@ export default function IndexPage() {
   const [promptIndex, setPromptIndex] = useState(0)
   const [fullData, setFullData] = useState(() => {
     if (typeof window !== "undefined") {
-      const savedData = localStorage.getItem("fullData")
+      const savedData = localStorage.getItem(`${getDateEpoch()}`)
+      let dates = localStorage.getItem("dates")
+      let parsedDates
+
+      if (dates) {
+        parsedDates = JSON.parse(dates)
+        if (!Array.isArray(parsedDates)) {
+          parsedDates = []
+        }
+      } else {
+        parsedDates = []
+      }
+
+      const epochValue = getDateEpoch()
+      if (!parsedDates.includes(epochValue)) {
+        parsedDates.push(epochValue)
+      }
+
+      localStorage.setItem("dates", JSON.stringify(parsedDates))
       return savedData ? JSON.parse(savedData) : {}
     }
   })
@@ -52,10 +70,30 @@ export default function IndexPage() {
     return () => clearInterval(interval)
   }, [])
 
+  function getDateEpoch() {
+    const currentDate = new Date()
+    const day = currentDate.getDate()
+    const month = currentDate.toLocaleString("default", { month: "long" })
+    const year = currentDate.getFullYear()
+    const dateString = `${month} ${day}, ${year}`
+    const date = new Date(dateString)
+    const epochMilliseconds = date.getTime()
+    const epochSeconds = Math.floor(epochMilliseconds / 1000)
+    return epochSeconds
+  }
+
   useEffect(() => {
-    const savedData = localStorage.getItem("fullData")
+    const savedData = localStorage.getItem(`${getDateEpoch()}`)
+    const epochSeconds = getDateEpoch()
+    console.log(epochSeconds)
+    // console.log(dateString)
+    // localStorage.clear();
+    console.log(localStorage.getItem("dates"))
+    console.log(savedData)
     if (savedData) {
+      // console.log(savedData[epochSeconds])
       setFullData(JSON.parse(savedData))
+      // setFullData(JSON.parse(savedData[epochSeconds]["newData"][epochSeconds]))
     }
   }, [])
 
@@ -93,7 +131,8 @@ export default function IndexPage() {
       [prompts[promptIndex]]: sentences,
     }
     setFullData(updatedFullData)
-    localStorage.setItem("fullData", JSON.stringify(updatedFullData))
+    var newData = { [getDateEpoch()]: updatedFullData }
+    localStorage.setItem(`${getDateEpoch()}`, JSON.stringify(updatedFullData))
   }, [sentences])
 
   useEffect(() => {

@@ -6,6 +6,10 @@ export const siteConfig = {
     "A mental health platform that allows you to write your thoughts and feelings in a safe and secure environment.",
   mainNav: [
     {
+      title: "Journal",
+      href: "/journal/today",
+    },
+    {
       title: "Write",
       href: "/",
     },
