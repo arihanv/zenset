@@ -85,11 +85,10 @@ export default function IndexPage() {
   useEffect(() => {
     const savedData = localStorage.getItem(`${getDateEpoch()}`)
     const epochSeconds = getDateEpoch()
-    console.log(epochSeconds)
     // console.log(dateString)
     // localStorage.clear();
-    console.log(localStorage.getItem("dates"))
-    console.log(savedData)
+    // console.log(localStorage.getItem("dates"))
+    // console.log(savedData)
     if (savedData) {
       // console.log(savedData[epochSeconds])
       setFullData(JSON.parse(savedData))
@@ -131,7 +130,6 @@ export default function IndexPage() {
       [prompts[promptIndex]]: sentences,
     }
     setFullData(updatedFullData)
-    var newData = { [getDateEpoch()]: updatedFullData }
     localStorage.setItem(`${getDateEpoch()}`, JSON.stringify(updatedFullData))
   }, [sentences])
 
@@ -147,6 +145,10 @@ export default function IndexPage() {
     <section className="grid items-center gap-6 pb-8 pt-6 md:py-10">
       <div className="mx-auto px-3 w-full flex max-w-[980px] flex-col gap-3 overflow-hidden">
         <div className="flex flex-col gap-1.5 border-b dark:border-gray-800 border-gray-200 py-1">
+          <div className="bg-gray-900 bg-opacity-80 rounded-xl w-fit px-2.5 py-1.5 flex gap-1 items-end mb-2">
+            <div className="text-3xl font-medium">{localStorage.getItem("wordCount") ?? 0}</div>
+            <div className="">Words</div>
+          </div>
           <div className="flex gap-1">
             <button
               disabled={promptIndex === 0}
@@ -246,6 +248,11 @@ export default function IndexPage() {
                   { text: input, timestamp: new Date() },
                   ...prev,
                 ])
+                if(localStorage.getItem("wordCount") === null) {
+                  localStorage.setItem("wordCount", `${input.split(" ").length}`)
+                } else {
+                  localStorage.setItem("wordCount", JSON.parse(localStorage.getItem("wordCount") ?? "null") + input.split(" ").length)
+                }
                 setInput("")
               }
             }}
@@ -259,9 +266,15 @@ export default function IndexPage() {
                 <div className="flex items-center gap-2" key={i}>
                   <div className="text-sm">
                     {/* {sentiment.analyze(s.text).score} */}
-                    {/* <div className={`h-2 w-2 aspect-square opacity-70 rounded-full ${sentiment.analyze(s.text).score > 0 ? 'bg-green-500' : sentiment.analyze(s.text).score < 0 ? 'bg-red-500' : 'bg-gray-300'}`}>
-                    
-                  </div> */}
+                    <div
+                      className={`h-2 w-2 aspect-square opacity-70 rounded-full ${
+                        sentiment.analyze(s.text).score > 0
+                          ? "bg-green-500"
+                          : sentiment.analyze(s.text).score < 0
+                          ? "bg-red-500"
+                          : "bg-gray-300"
+                      }`}
+                    ></div>
                   </div>
                   <div
                     key={i}

@@ -34,6 +34,16 @@ export default function IndexPage({
   return (
     <section className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
       <div className="flex max-w-[980px] flex-col items-start gap-2">
+        <h1 className="text-2xl font-semibold border-b-2 w-full pb-2">
+          {params.id.toString() === "today" ||
+          params.id.toString() === getDateEpoch().toString()
+            ? "Today's Journal"
+            : new Date(params.id * 1000).toLocaleString("default", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+        </h1>
         {data && Object.entries(data).length > 0 && (
           <>
             {Object.entries(data).map(([question, texts]) => (

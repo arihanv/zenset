@@ -28,7 +28,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const files = dates.map((name) => {
     const currentDate = new Date(name * 1000)
-    console.log(currentDate)
+    // console.log(currentDate)
     const day = currentDate.getDate()
     const month = currentDate.toLocaleString("default", { month: "long" })
     const year = currentDate.getFullYear()
@@ -43,7 +43,7 @@ export default function Layout({ children }: LayoutProps) {
     const date = new Date(path)
     const epochMilliseconds = date.getTime()
     const epochSeconds = Math.floor(epochMilliseconds / 1000)
-    console.log(epochSeconds)
+    // console.log(epochSeconds)
     router.push(`/journal/${epochSeconds}`)
   }
 
@@ -51,9 +51,9 @@ export default function Layout({ children }: LayoutProps) {
     setDates(JSON.parse(localStorage.getItem("dates") ?? "null"));
   }, [])
 
-  React.useEffect(() => {
-    console.log(dates)
-  }, [dates])
+  // React.useEffect(() => {
+  //   console.log(dates)
+  // }, [dates])
 
   return (
     <div className="flex min-h-[100vh]">
