@@ -1,10 +1,10 @@
 "use client"
 
 import React from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { GeistProvider, Tree } from "@geist-ui/core"
 import { Menu, XCircle } from "lucide-react"
+import Link from "next/link"
 
 interface LayoutProps {
   children: React.ReactNode
@@ -15,11 +15,13 @@ export default function Layout({ children }: LayoutProps) {
   const [showTree, setShowTree] = React.useState(false)
   const [dates, setDates] = React.useState([])
 
-  if (JSON.parse(localStorage.getItem("dates") ?? "null") === null) {
+  if(JSON.parse(localStorage.getItem("dates") ?? "null") === null) {
     return (
       <div className="flex min-h-[100vh] items-center justify-center text-3xl">
         You Need to Write Something First
-        <Link href="/">hello</Link>
+          <Link href="/">
+            hello
+          </Link>
       </div>
     )
   }
@@ -37,7 +39,7 @@ export default function Layout({ children }: LayoutProps) {
     }
   })
 
-  const handler = (path: any) => {
+  const handler = (path:any) => {
     const date = new Date(path)
     const epochMilliseconds = date.getTime()
     const epochSeconds = Math.floor(epochMilliseconds / 1000)
@@ -45,19 +47,10 @@ export default function Layout({ children }: LayoutProps) {
     router.push(`/journal/${epochSeconds}`)
   }
 
-  const datesFromLocalStorage = JSON.parse(
-    localStorage.getItem("dates") ?? "null"
-  )
-
-  if (datesFromLocalStorage !== null) {
-    React.useEffect(() => {
-      setDates(datesFromLocalStorage)
-    }, [])
-  } else {
-    React.useEffect(() => {
-      setDates([])
-    }, [])
-  }
+  React.useEffect(() => {
+    {/* @ts-ignore */}
+    setDates(JSON.parse(localStorage.getItem("dates")));
+  }, [])
 
   // React.useEffect(() => {
   //   console.log(dates)
@@ -85,7 +78,8 @@ export default function Layout({ children }: LayoutProps) {
               onClick={() => {
                 localStorage.clear()
                 router.push("/")
-              }}
+              }
+              }
             >
               <div className="flex gap-2 items-center">
                 <XCircle color="red" size={17} />
