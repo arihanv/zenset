@@ -13,19 +13,29 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const router = useRouter()
   const [showTree, setShowTree] = React.useState(false)
-  const [dates, setDates] = React.useState([])
+  const [dates, setDates] = React.useState(() => {
+    if(typeof window !== "undefined") {
+      return JSON.parse(localStorage.getItem("dates") ?? "null")
+    }
+  })
 
-  if(JSON.parse(localStorage.getItem("dates") ?? "null") === null) {
-    return (
-      <div className="flex min-h-[100vh] items-center justify-center text-3xl">
-        You Need to Write Something First
-          <Link href="/">
-            hello
-          </Link>
-      </div>
-    )
-  }
+  // React.useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     setDates(JSON.parse(localStorage.getItem("dates") ?? "null"))
+  //   }
+  // }, [])
 
+  // if(JSON.parse(localStorage.getItem("dates") ?? "null") === null) {
+  //   return (
+  //     <div className="flex min-h-[100vh] items-center justify-center text-3xl">
+  //       You Need to Write Something First
+  //         <Link href="/">
+  //           hello
+  //         </Link>
+  //     </div>
+  //   )
+  // }
+  {/* @ts-ignore */}
   const files = dates.map((name) => {
     const currentDate = new Date(name * 1000)
     // console.log(currentDate)
@@ -47,10 +57,10 @@ export default function Layout({ children }: LayoutProps) {
     router.push(`/journal/${epochSeconds}`)
   }
 
-  React.useEffect(() => {
-    {/* @ts-ignore */}
-    setDates(JSON.parse(localStorage.getItem("dates")));
-  }, [])
+  // React.useEffect(() => {
+  //   {/* @ts-ignore */}
+  //   setDates(JSON.parse(localStorage.getItem("dates")));
+  // }, [])
 
   // React.useEffect(() => {
   //   console.log(dates)

@@ -30,6 +30,11 @@ export default function IndexPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [hoveredIndex, setHoveredIndex] = useState(-1)
   const [promptIndex, setPromptIndex] = useState(0)
+  const [words, setWords] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("wordCount")
+    }
+  })
   const [fullData, setFullData] = useState(() => {
     if (typeof window !== "undefined") {
       const savedData = localStorage.getItem(`${getDateEpoch()}`)
@@ -146,7 +151,7 @@ export default function IndexPage() {
       <div className="mx-auto px-3 w-full flex max-w-[980px] flex-col gap-3 overflow-hidden">
         <div className="flex flex-col gap-1.5 border-b dark:border-gray-800 border-gray-200 py-1">
           <div className="bg-gray-900 bg-opacity-80 rounded-xl w-fit px-2.5 py-1.5 flex gap-1 items-end mb-2">
-            <div className="text-3xl font-medium">{localStorage.getItem("wordCount") ?? 0}</div>
+            <div className="text-3xl font-medium">{words ?? 0}</div>
             <div className="">Words</div>
           </div>
           <div className="flex gap-1">
@@ -248,11 +253,21 @@ export default function IndexPage() {
                   { text: input, timestamp: new Date() },
                   ...prev,
                 ])
-                if(localStorage.getItem("wordCount") === null) {
-                  localStorage.setItem("wordCount", `${input.split(" ").length}`)
+                if (localStorage.getItem("wordCount") === null) {
+                  localStorage.setItem(
+                    "wordCount",
+                    `${input.split(" ").length}`
+                  )
                 } else {
-                  localStorage.setItem("wordCount", JSON.parse(localStorage.getItem("wordCount") ?? "null") + input.split(" ").length)
+                  localStorage.setItem(
+                    "wordCount",
+                    JSON.parse(localStorage.getItem("wordCount") ?? "null") +
+                      input.split(" ").length
+                  )
                 }
+                setWords(
+                  JSON.parse(localStorage.getItem("wordCount") ?? "null")
+                )
                 setInput("")
               }
             }}
