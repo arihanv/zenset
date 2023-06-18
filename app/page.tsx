@@ -269,7 +269,7 @@ export default function IndexPage() {
                   <DialogHeader>
                     <DialogTitle>Congratulations!</DialogTitle>
                     <DialogDescription>
-                      You wrote 500 words today! You've earned a reward! 
+                      You wrote 500 words today! You earned a reward! 
                       <div className="mt-2 mb-3">
                       Please enter your wallet address below to receive your reward.
                       </div>
