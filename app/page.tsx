@@ -11,12 +11,22 @@ import {
   Meh,
   PlusCircle,
   Smile,
+  Star,
   Trash,
   Trash2,
 } from "lucide-react"
 
 import { siteConfig } from "@/config/site"
-import { buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -34,8 +44,11 @@ export default function IndexPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [hoveredIndex, setHoveredIndex] = useState(-1)
   const [promptIndex, setPromptIndex] = useState(0)
+  const [reward, setReward] = useState<any>(null)
+  const [redeemed, setRedeemed] = useState<any>(null)
   const [words, setWords] = useState(0)
-  const [mood, setMood] = useState<number | null>(null);
+  const [address, setAddress] = useState("")
+  const [mood, setMood] = useState<number | null>(null)
   useEffect(() => setWords(Number(localStorage.getItem("wordCount")) ?? "null"))
 
   const [fullData, setFullData] = useState(() => {
@@ -119,6 +132,7 @@ export default function IndexPage() {
     }
   }, [])
 
+
   const getTimeElapsed = (timestamp: any) => {
     const elapsed = Math.floor(((currentTime as any) - timestamp) / 1000)
     if (elapsed < 0) return "0s ago"
@@ -151,21 +165,36 @@ export default function IndexPage() {
     if (words === undefined || words == null) {
       return
     }
-    if (Number(words) === 10) {
-      // alert("You've written 500 words today! That's amazing!")
-      axios
-        .get("/api/redeem")
-        .then((response) => {
-          // Handle the data received from the API
-          console.log(response.data.message)
-          alert(response.data.message)
-        })
-        .catch((error) => {
-          // Handle any errors that occurred during the request
-          console.error(error)
-        })
+    if (redeemed) return
+    if (Number(words) >= 500) {
+      setReward(true)
     }
   }, [words])
+
+  useEffect(() => {
+    if (localStorage.getItem("Redeemed") === "true") {
+      setRedeemed(true)
+    }
+  }, [])
+
+  const getReward = () => {
+    if (!reward) return
+    if (redeemed) return
+    axios
+      .get(`/api/redeem/${address}`)
+      .then((response) => {
+        // Handle the data received from the API
+        console.log(response.data.message)
+        alert(response.data.message)
+        setRedeemed(true)
+        localStorage.setItem("Redeemed", "true")
+        setReward(false)
+      })
+      .catch((error) => {
+        // Handle any errors that occurred during the request
+        console.error(error)
+      })
+  }
 
   useEffect(() => {
     const updatedFullData = {
@@ -220,9 +249,49 @@ export default function IndexPage() {
     <section className="grid items-center gap-6 pb-8 pt-6 md:py-10">
       <div className="mx-auto px-3 w-full flex max-w-[980px] flex-col gap-3 overflow-hidden">
         <div className="flex flex-col gap-1.5 border-b dark:border-gray-800 border-gray-200 py-1">
-          <div className="dark:bg-gray-900 bg-gray-100 bg-opacity-80 rounded-xl w-fit px-2.5 py-1.5 flex gap-1 items-end mb-2">
-            <div className="text-3xl font-medium">{words ?? 0}</div>
-            <div className="">Words</div>
+          <div className="flex gap-3 items-center">
+            <div className="dark:bg-gray-900 bg-gray-100 bg-opacity-80 rounded-xl w-fit px-2.5 py-1.5 flex gap-1 items-end mb-2">
+              <div className="text-3xl font-medium">{words ?? 0}</div>
+              <div className="">Words</div>
+            </div>
+
+            {reward && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="dark:bg-gray-900 bg-gray-100 bg-opacity-80 rounded-xl w-fit px-2.5 py-1.5 flex gap-2 items-end mb-2">
+                    <div className="text-3xl font-medium">
+                      <Star color={"yellow"} />
+                    </div>
+                    <div className="">Reward</div>
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Congratulations!</DialogTitle>
+                    <DialogDescription>
+                      You wrote 500 words today! You've earned a reward! 
+                      <div className="mt-2 mb-3">
+                      Please enter your wallet address below to receive your reward.
+                      </div>
+                      <Input
+                        onChange={(e) => setAddress(e.target.value)}
+                        id="name"
+                        value={address}
+                        placeholder="Address..."
+                        className="col-span-3"
+                      />
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    {address !== "" && (
+                      <Button onClick={getReward} type="submit">
+                        Redeem
+                      </Button>
+                    )}
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
           <div className="flex gap-1">
             <button

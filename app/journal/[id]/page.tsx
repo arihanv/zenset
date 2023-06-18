@@ -50,7 +50,7 @@ export default function IndexPage({
               <>
                 {/* @ts-ignore */}
                 {texts.length !== 0 && (
-                  <div className="hover:bg-gray-200 p-2.5 hover:rounded-xl w-full border-b">
+                  <div className="hover:bg-gray-200 hover:dark:bg-gray-800 p-2.5 hover:rounded-xl w-full border-b">
                     <div key={question} className="mb-7">
                       <h3 className="font-semibold tracking-tight text-2xl mb-1">
                         {question}
